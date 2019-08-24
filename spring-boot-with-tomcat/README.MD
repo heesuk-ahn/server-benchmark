@@ -121,7 +121,7 @@ Requests/sec:     89.29
 Transfer/sec:     12.21KB
 ```
 
-[!ASYNC-RestTemplate](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-tomcat/images/ASYNC-RestTemplate.png)
+[!ASYNC-RestTemplate](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-tomcat/images/ASYNC-RestTemplate.png?raw=true)
 
  Test Case 3번의 경우에는 톰캣 스레드가 1개이지만 좋은 퍼포먼스를 보인다.
 하지만 이미지를 보면 알수 잇듯이 실제 워커 스레드가 100개가 넘게 생성되어 처리를 한다.
