@@ -1,7 +1,8 @@
 ## 스프링 부트 + 톰캣 벤치마크 테스트
+- - -
 
 ### 개요
---
+- - -
 
   API 서버는 하나의 thread가 얼마나 많은 요청을 처리할 수 있는지가 퍼포먼스에 영향을 끼친다.
 우리가 자주 사용하는 스프링 부트 프레임워크에서 톰캣의 스레드 수를 하나로 고정하고 얼마나 많은
@@ -9,30 +10,18 @@
 개선할 수 있을지 느껴보는 것은 중요한 공부가 될 것이다.
 
 ### 동기방식
---
+- - -
 
  동기방식으로 서버 코드를 작성하면 프로그래밍 코드가 순차적으로 진행되기 때문에, 흐름을 이해하기가 쉽다.
 그러나 하나의 요청이 하나의 스레드를 차지하게 되면, 해당 스레드는 더 많은 일을 할 수 가 없어진다.
- 스레드가 Block 함수를 만나게 되면 스레드는 `BLOCK STATUS` 에 빠지게 되고, 그때 바로 `스레드 컨텍스트 스위칭`이
-발생하게 된다. 그리고 블락 상태에 대기중인 스레드는 다른 일을 하지 못하고 해당 함수가 종료 될 때까지, `가만히 기다리게 된다.`
+ 스레드가 Block 함수를 만나게 되면 스레드는 `Runnable` 상태로 `Ready` Status를 유지하게 된다.
+그때 바로 `스레드 컨텍스트 스위칭`이 발생하게 된다. 그리고 블락 상태에 대기중인 스레드는 다른 일을 하지 못하고 해당 함수가 종료 될 때까지, `가만히 기다리게 된다.`
 이러한 현상이 지속되면, 일을 할 수 있는 스레드가 병목 지점에서 대기하게 되고, 결국 스레드 풀 헬 현상까지 이어지게 된다.
 
-(이미지 추가 - 링크드인 스레드풀 헬)
-(이미지 추가 - 요청에 따른 JAVA IO 네트워크 소켓 처리)
-(이미지 추가 - 요청에 따른 JAVA IO 네트워크 소켓 처리 멀티 스레드 방식)
-
-### 설정
---
-
-톰캣의 요청 스레드 풀은 하나로 고정한다.
-
-```aidl
-[tomcat server thread setting]
-server.tomcat.max-threads=1
-```
+[!thread-pool-hell](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-tomcat/images/thread-pool-hell.png?raw=true)
 
 ### 동기 방식 테스트 시나리오
---
+- - -
 
   기본적으로 2가지 스프링 부트 서비스를 띄운다. 하나는 요청을 받는 서비스고 하나는 원격 서비스로써 
 1초동안 작업 시간이 소요되는 Remote 서비스이다.
@@ -66,7 +55,7 @@ TestCase 3) 톰캣 스레드 풀 1개 + Async API Call
 ```
 
 ### 실행 결과
---
+- - -
 
 Test Case 1)
 
@@ -88,7 +77,6 @@ Running 10s test @ http://localhost:8080/v1/hello
   Socket errors: connect 0, read 1, write 0, timeout 0
 
 ```
-(thread-sync-pool 이미지 추가)
 
 Test Case 2) 
 
@@ -133,7 +121,7 @@ Requests/sec:     89.29
 Transfer/sec:     12.21KB
 ```
 
-[!ASYNC-RestTemplate](/ASYNC-RestTemplate.png)
+[!ASYNC-RestTemplate](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-tomcat/images/ASYNC-RestTemplate.png)
 
  Test Case 3번의 경우에는 톰캣 스레드가 1개이지만 좋은 퍼포먼스를 보인다.
 하지만 이미지를 보면 알수 잇듯이 실제 워커 스레드가 100개가 넘게 생성되어 처리를 한다.
@@ -149,7 +137,7 @@ AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate(new Netty4ClientHttp
 이렇게 사용하면 tomcat의 스레드 1개와 netty에 사용되는 몇개의 스레드만으로 좋은 퍼포먼스를 낼 수 있다.
 
 ### 결론
---
+- - -
 
  Remote Service에 Network IO 상황을 RestTemplate와 AsyncRestTemplate로 테스트를 하였다.
 이를 통해서 스레드 1개로도 충분한 퍼포먼스를 보일 수 있다는 것을 알 수 있었다.
