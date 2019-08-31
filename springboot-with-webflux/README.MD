@@ -6,7 +6,7 @@
  스프링 5 부터 리액티브 API를 기반으로 한 웹플럭스가 나왔다. 이 웹플럭스는 이벤트 드리븐 아키텍처 구조로
 이벤트 루프를 도는 스레드들이 빠르게 요청을 받고 워커 스레드로 넘겨 처리를 하는 방식을 사용한다.
  
-![event-driven](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/event-driven.png?raw=true)
+![event-driven](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/event-driven.png?raw=true)
 
  위의 이미지를 살펴보면, 어떤 작업이 완료되면 이벤트가 발생하고 그 이벤트를 다시 이벤트 루프 스레드가 처리하여 반환하는 것을
 알 수 있다. 오늘은 이 웹플럭스가 무엇인지와 그리고 이 웹플럭스의 성능 벤치마킹을 통해서 스레드들이 어떤 식으로 사용되는지에 대해서
@@ -100,7 +100,7 @@ Reactive 스타일은 이벤트 드리븐 스타일로 호출한 쪽에서 호�
 10초 동안 약 `124011 requests in 10.05s`를 처리하는 결과를 얻을 수 있었다. 
 하지만, 생성된 스레드 수는 아래 이미지와 같다. 스레드가 120개까지 올라가는 것을 알 수 있다.
 
-![tomcat-case](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/tomcat.png?raw=true)
+![tomcat-case](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/tomcat.png?raw=true)
 
 [웹 플럭스]
 
@@ -108,7 +108,7 @@ Reactive 스타일은 이벤트 드리븐 스타일로 호출한 쪽에서 호�
 톰캣 with 동기에 비해서  `8배` 정도 차이가 나는 것을 알 수 있다.
  스레드는 어떨까? 아래 이미지를 살펴보면 약 20개정도로 전체 스레드의 수는 톰캣에 비해 `6배 적게 사용` 한것을 알 수 있다.
  
-![webflux-hello-case](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/webflux-hello-case.png?raw=true)
+![webflux-hello-case](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/webflux-hello-case.png?raw=true)
 
  단순하게 Hello만 리턴하는 경우로 비교했을 때, 큰 성능차이가 나는 것을 알 수 있다. 이런차이는 왜 발생할까?
 여기서만 봤을 때는 추측할 수 있는 것이 `이벤트 루프`가 빠르게 요청을 받고 워커 스레드에 넘기고 다시 요청을 받기 위한 스레드 풀로
@@ -150,7 +150,7 @@ public Book getHelloBlockRoute() {
  왔다갔다 하는 것을 볼 수 있다.
   처리량은  `262381 requests in 10.03s` 이였다.
   
-![tomcat-db-running](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/tomcat-db-running.png?raw=true)
+![tomcat-db-running](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/tomcat-db-running.png?raw=true)
 
  
 [웹 플럭스 with Netty]
@@ -159,7 +159,7 @@ public Book getHelloBlockRoute() {
 웹플럭스의 처리량은 `418479 requests in 10.03s`으로 톰캣과 비교하여 약 4배의 처리량을 보였다.
 하지만 스레드 수는 event loop의 default size인 CPU Core 갯수인데, 8개로 이정도의 처리량을 보였다.
  
-![webflux-db-running](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/webflux-db-running.png?raw=true)
+![webflux-db-running](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/webflux-db-running.png?raw=true)
 
 event loop의 디폴트 사이즈 스레드로만도 이정도 성능을 낸다면, 만약 워커 스레드까지 동원한다면 어느정도까지
 성능을 올릴 수 있을까?
@@ -189,9 +189,9 @@ event loop의 디폴트 사이즈 스레드로만도 이정도 성능을 낸다�
  처리량은 오히려 떨어졌다.  `347829 requests in 10.02s` 동안 처리를 했고, 레이턴시 평균은 `3.82ms` 였다.
 
 
-![webflux-elastic](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/webflux-elastic.png?raw=true)
+![webflux-elastic](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/webflux-elastic.png?raw=true)
 
-![webflux-worker](https://github.com/heesuk-ahn/server-benchmark/blob/master/spring-boot-with-webflux/images/webflux-worker.png?raw=true)
+![webflux-worker](https://github.com/heesuk-ahn/server-benchmark/blob/master/springboot-with-webflux/images/webflux-worker.png?raw=true)
 
  왜 처리량이 떨어졌을까? 아마 예측하기로 스레드 컨텍스트 스위칭이 발생하면서 해당 비용으로 인해 성능 저하가 발생하지 않았을까 싶다.
 하지만 일반적으로 event loop thread는 blocking이 안걸리게 하는 것이 당연히 성능에 이점이 있다. 
