@@ -1,11 +1,15 @@
 package com.heeusk.springbootwithtomcat;
 
+import com.heeusk.springbootwithtomcat.repository.Book;
+import com.heeusk.springbootwithtomcat.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +18,21 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @Slf4j
 public class SpringBootWithTomcatApplication {
+
+  @Autowired
+  BookRepository bookRepository;
+
+  @GetMapping("/v1/just-hello")
+  public String getHello() throws InterruptedException {
+    return "HELLO";
+  }
+
+  @GetMapping("/v1/books")
+  public Book createBookRoute() {
+    Book newBook = new Book();
+    newBook.setName("BOOK");
+    return bookRepository.save(newBook);
+  }
 
   @GetMapping("/v1/hello")
   public String getHelloWithBlocking() throws InterruptedException {
@@ -32,8 +51,8 @@ public class SpringBootWithTomcatApplication {
   }
 
   public static void main(String[] args) {
-    System.setProperty("server.port", "8082");
-    System.setProperty("server.tomcat.max-threads", "1");
+    System.setProperty("server.port", "8081");
+    System.setProperty("server.tomcat.max-threads", "1000");
     SpringApplication.run(SpringBootWithTomcatApplication.class, args);
   }
 
